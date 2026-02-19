@@ -1,9 +1,14 @@
 package com.digitalid.person;
 
-import org.junit.jupiter.api.*;
-import java.io.*;
-import java.nio.file.*;
-import static org.junit.jupiter.api.Assertions.*;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class PersonTest {
     
@@ -93,5 +98,42 @@ public class PersonTest {
         );
         
         assertFalse(person.addPerson(invalidPerson));
+    }
+    
+    // Rohan's Test Cases 
+    // 6) Valid Passport
+    @Test
+    void test1_ValidPassport() {
+        // Birth year 1990 = adult
+        Person p = new Person("22@#$AB", "John", "Doe", "32|St|Melb|Victoria|AU", "15-11-1990");
+        assertTrue(p.addID("22@#$AB", "Passport", "AB123456"));
+    }
+
+    // 7) Invalid Medicare (Too Short)
+    @Test
+    void test2_InvalidMedicare() {
+        Person p = new Person("22@#$AB", "John", "Doe", "32|St|Melb|Victoria|AU", "15-11-1990");
+        assertFalse(p.addID("22@#$AB", "Medicare", "123"));
+    }
+
+    // 8) Invalid Passport (No Letters)
+    @Test
+    void test3_InvalidPassport_NoLetters() {
+        Person p = new Person("22@#$AB", "John", "Doe", "32|St|Melb|Victoria|AU", "15-11-1990");
+        assertFalse(p.addID("22@#$AB", "Passport", "12345678"));
+    }
+
+    // 9) Valid Student (Minor)
+    @Test
+    void test4_ValidStudent_Minor() {
+        Person minor = new Person("22@#$AB", "Tim", "Young", "32|St|Melb|Victoria|AU", "01-01-2015");
+        assertTrue(minor.addID("22@#$AB", "Student Card", "123456789012"));
+    }
+
+    // 10) Invalid Student (Adult)
+    @Test
+    void test5_InvalidStudent_Adult() {
+        Person adult = new Person("22@#$AB", "Old", "Mate", "32|St|Melb|Victoria|AU", "01-01-1990");
+        assertFalse(adult.addID("22@#$AB", "Student Card", "123456789012"));
     }
 }
