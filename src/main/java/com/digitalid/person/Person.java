@@ -1,6 +1,9 @@
 package com.digitalid.person;
 
-import java.io.*;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -124,8 +127,63 @@ public class Person {
         return false;
     }
     
-    // Placeholder for Person 3
-    public boolean addID(String personID, String idType, String idValue) {
+    // Placeholder for Person 3 (Rohan)
+    // personID (pID) 
+    public boolean addID(String pID, String idType, String idValue) {
+        boolean isValid = false;
+
+        // Passport has 8 chars: 2 Uppercase letters + 6 Numbers
+        if (idType.equalsIgnoreCase("Passport")) {
+            if (idValue != null && idValue.matches("^[A-Z]{2}[0-9]{6}$")) {
+                isValid = true;
+            }
+        } 
+        // driver's License has 10 chars: 2 Uppercase letters + 8 Numbers
+        else if (idType.equalsIgnoreCase("Drivers Licence")) {
+            if (idValue != null && idValue.matches("^[A-Z]{2}[0-9]{8}$")) {
+                isValid = true;
+            }
+        } 
+        // medicare has 9 numbers
+        else if (idType.equalsIgnoreCase("Medicare")) {
+            if (idValue != null && idValue.matches("^[0-9]{9}$")) { 
+                isValid = true;
+            }
+        } 
+        // Student Card has 12 digits only if under 18
+        else if (idType.equalsIgnoreCase("Student Card")) {
+            if (isUnder18() && idValue != null && idValue.matches("^[0-9]{12}$")) {
+                isValid = true;
+            }
+        }
+
+        if (isValid) {
+            return saveIDToFile(pID, idType, idValue);
+        }
+
         return false;
+    }
+    // helper
+    private boolean isUnder18() {
+        if (this.birthday == null){ 
+            return false;
+        }
+        String[] parts = this.birthday.split("-");
+        int birthYear = Integer.parseInt(parts[2]);
+        int currentYear = LocalDate.now().getYear();
+        
+        int age = currentYear - birthYear;
+        return age < 18;
+    }
+
+    private boolean saveIDToFile(String pID, String type, String value) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter("ids.txt", true))) {
+            writer.write("PersonID: " + pID + " | User: " + firstName + " " + lastName + " | " + type + ": " + value);
+            writer.newLine();
+            return true;
+        } catch (IOException e) {
+            System.err.println("File Error: " + e.getMessage());
+            return false;
+        }
     }
 }
