@@ -119,7 +119,7 @@ public class PersonTest {
     // 8) Invalid Passport (No Letters)
     @Test
     void test3_InvalidPassport_NoLetters() {
-        Person p = new Person("22@#$AB", "John", "Doe", "32|St|Melb|Victoria|AU", "15-11-1990");
+        Person p = new Person("22@#$AB", "Micheal", "Jackson", "32|St|Melb|Victoria|AU", "15-11-1990");
         assertFalse(p.addID("22@#$AB", "Passport", "12345678"));
     }
 
