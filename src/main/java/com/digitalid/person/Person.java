@@ -158,22 +158,37 @@ public boolean updatePersonalDetails(String personID, Person updatedPerson) {
 
                 int age = calculateAge(oldBirthday);
 
-                // RULE 1: under 18's cant change their address
-                if (age < 18 && !oldAddress.equals(updatedPerson.getAddress())) return false;
+                boolean canEdit = true;
 
+                // RULE 1: Under 18 cannot change address
+                if (age < 18 && !oldAddress.equals(updatedPerson.getAddress())) {
+                    canEdit = false;
+                }
+                
                 // RULE 2: If birthday changes, nothing else can change
                 if (!oldBirthday.equals(updatedPerson.getBirthday())) {
                     if (!oldID.equals(updatedPerson.getPersonID()) ||
                         !oldFirstName.equals(updatedPerson.getFirstName()) ||
                         !oldLastName.equals(updatedPerson.getLastName()) ||
                         !oldAddress.equals(updatedPerson.getAddress())) {
-                        return false;
+                        canEdit = false;
                     }
                 }
+                
                 // RULE 3: If first digit of old ID is even, cannot change ID
                 int firstDigit = Character.getNumericValue(oldID.charAt(0));
-                if (firstDigit % 2 == 0 && !oldID.equals(updatedPerson.getPersonID())) return false;
+                if (firstDigit % 2 == 0 && !oldID.equals(updatedPerson.getPersonID())) {
+                    canEdit = false;
+                }
+                
+                if (!canEdit) {
+                    return false;
+                }
 
+                // Validate updated data
+                if (!isValidPersonID(updatedPerson.getPersonID())) return false;
+                if (!isValidAddress(updatedPerson.getAddress())) return false;
+                if (!isValidBirthday(updatedPerson.getBirthday())) return false;
                 //update line
                 line = updatedPerson.getPersonID() + "|" +
                        updatedPerson.getFirstName() + "|" +
