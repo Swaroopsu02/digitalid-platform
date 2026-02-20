@@ -128,7 +128,8 @@ public class Person {
     }
     
     // Placeholder for Person 3 (Rohan)
-    // personID (pID) 
+    // function addID() 
+    // ps note: personID (pID) 
     public boolean addID(String pID, String idType, String idValue) {
         boolean isValid = false;
 
@@ -163,7 +164,7 @@ public class Person {
 
         return false;
     }
-    // helper
+    // helper for addID()
     private boolean isUnder18() {
         if (this.birthday == null){ 
             return false;
