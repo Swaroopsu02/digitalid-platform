@@ -156,4 +156,111 @@ public class PersonTest {
                                 "01-01-1990");
         assertFalse(adult.addID("22@#$AB", "Student Card", "123456789012"));
     }
+
+// Abi's Test Cases:
+// 11) Update valid details (PASS)
+@Test
+void testUpdateValidDetails_ReturnsTrue() throws IOException {
+    Person original = new Person(
+        "56s_d%&fAB",
+        "John",
+        "Doe",
+        "32|Highland Street|Melbourne|Victoria|Australia",
+        "15-11-2000"
+    );
+    person.addPerson(original);
+
+    Person updated = new Person(
+        "56s_d%&fAB",
+        "Johnny",
+        "Doe",
+        "32|Highland Street|Melbourne|Victoria|Australia",
+        "15-11-2000"
+    );
+
+    assertTrue(person.updatePersonalDetails("56s_d%&fAB", updated));
+}
+
+// 12) Under 18 cannot change address (FAIL)
+@Test
+void testUpdateUnder18AddressChange_ReturnsFalse() throws IOException {
+    Person minor = new Person(
+        "56s_d%&fAB",
+        "Alice",
+        "Smith",
+        "32|Highland Street|Melbourne|Victoria|Australia",
+        "15-11-2010"
+    );
+    person.addPerson(minor);
+
+    Person updated = new Person(
+        "56s_d%&fAB",
+        "Alice",
+        "Smith",
+        "33|Highland Street|Melbourne|Victoria|Australia", // address change
+        "15-11-2010"
+    );
+
+    assertFalse(person.updatePersonalDetails("56s_d%&fAB", updated));
+}
+
+// 13) Changing birthday + other details at same time (FAIL)
+@Test
+void testBirthdayChangeWithOtherDetails_ReturnsFalse() throws IOException {
+    Person p = new Person(
+        "56s_d%&fAB",
+        "John",
+        "Doe",
+        "32|Highland Street|Melbourne|Victoria|Australia",
+        "15-11-2000"
+    );
+    person.addPerson(p);
+
+    Person updated = new Person(
+        "56s_d%&fAB",
+        "Johnny", // name changed
+        "Doe",
+        "32|Highland Street|Melbourne|Victoria|Australia",
+        "16-11-2000" // birthday changed
+    );
+
+    assertFalse(person.updatePersonalDetails("56s_d%&fAB", updated));
+}
+
+// 14) Even first digit in ID → cannot change ID (FAIL)
+@Test
+void testEvenFirstDigitIDChange_ReturnsFalse() throws IOException {
+    Person p = new Person(
+        "26s_d%&fAB", // starts with 2 (even)
+        "John",
+        "Doe",
+        "32|Highland Street|Melbourne|Victoria|Australia",
+        "15-11-2000"
+    );
+    person.addPerson(p);
+
+    Person updated = new Person(
+        "56s_d%&fAB", // trying to change ID
+        "John",
+        "Doe",
+        "32|Highland Street|Melbourne|Victoria|Australia",
+        "15-11-2000"
+    );
+
+    assertFalse(person.updatePersonalDetails("26s_d%&fAB", updated));
+}
+
+// 15) PersonID not found (FAIL)
+@Test
+void testPersonIDNotFound_ReturnsFalse() {
+    Person updated = new Person(
+        "56s_d%&fAB",
+        "John",
+        "Doe",
+        "32|Highland Street|Melbourne|Victoria|Australia",
+        "15-11-2000"
+    );
+
+    assertFalse(person.updatePersonalDetails("NONEXISTENT", updated));
+}
 }
