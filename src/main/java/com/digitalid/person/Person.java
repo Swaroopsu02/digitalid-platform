@@ -1,12 +1,20 @@
 package com.digitalid.person;
 
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileReader;
+import java.
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.util.ArrayList;
+import java.util.List;
+
 
 public class Person {
     private String personID;
@@ -122,10 +130,85 @@ public class Person {
         }
     }
     
-    // Placeholder for Person 2
-    public boolean updatePersonalDetails(String personID, Person updatedPerson) {
+    // Placeholder for Person 2 (Abi)
+// calculating age for rule 1
+private int calculateAge(String birthDate) {
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+    LocalDate birth = LocalDate.parse(birthDate, formatter);
+    return LocalDate.now().getYear() - birth.getYear();
+}
+
+
+public boolean updatePersonalDetails(String personID, Person updatedPerson) {
+
+    File inputFile = new File(FILE_NAME);
+    List<String> lines = new ArrayList<>();
+    boolean updated = false;
+
+    try (BufferedReader reader = new BufferedReader(new FileReader(inputFile))) {
+        String line;
+
+        while ((line = reader.readLine()) != null) {
+            String[] parts = line.split("\\|");
+
+            if (parts[0].equals(personID)) {
+                String oldID = parts[0];
+                String oldFirstName = parts[1];
+                String oldLastName = parts[2];
+                String oldAddress = parts[3];
+                String oldBirthday = parts[4];
+
+                int age = calculateAge(oldBirthday);
+
+                // RULE 1: under 18's cant change their address
+                if (age < 18 && !oldAddress.equals(updatedPerson.getAddress())) return false;
+
+                // RULE 2: If birthday changes, nothing else can change
+                if (!oldBirthday.equals(updatedPerson.getBirthday())) {
+                    if (!oldID.equals(updatedPerson.getPersonID()) ||
+                        !oldFirstName.equals(updatedPerson.getFirstName()) ||
+                        !oldLastName.equals(updatedPerson.getLastName()) ||
+                        !oldAddress.equals(updatedPerson.getAddress())) {
+                        return false;
+                    }
+                }
+                // RULE 3: If first digit of old ID is even, cannot change ID
+                int firstDigit = Character.getNumericValue(oldID.charAt(0));
+                if (firstDigit % 2 == 0 && !oldID.equals(updatedPerson.getPersonID())) return false;
+
+                //update line
+                line = updatedPerson.getPersonID() + "|" +
+                       updatedPerson.getFirstName() + "|" +
+                       updatedPerson.getLastName() + "|" +
+                       updatedPerson.getAddress() + "|" +
+                       updatedPerson.getBirthday();
+
+                updated = true;
+            }
+
+            lines.add(line);
+        }
+    } catch (IOException e) {
+        e.printStackTrace();
         return false;
     }
+
+    if (!updated) return false;
+
+    try (BufferedWriter writer = new BufferedWriter(new FileWriter(FILE_NAME))) {
+        for (String l : lines) {
+            writer.write(l);
+            writer.newLine();
+        }
+    } catch (IOException e) {
+        e.printStackTrace();
+        return false;
+    }
+
+    return true;
+}
+        
+
     
     // Placeholder for Person 3 (Rohan)
     // personID (pID) 
@@ -186,4 +269,5 @@ public class Person {
             return false;
         }
     }
+    
 }
